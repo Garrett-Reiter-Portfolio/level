@@ -1,9 +1,6 @@
-//use super::{Buttons, GPIO};
-
-use crate::GPIO;
+use super::GPIO;
 use microbit::board::Buttons;
 
-//use cortex_m::interrupt::free as interrupt_free;
 use microbit::{
     hal::{
         gpio::{Floating, Input, Pin},
@@ -27,8 +24,6 @@ pub fn init_buttons(board_gpiote: pac::GPIOTE, board_buttons: Buttons) {
     let channel1 = gpiote.channel1();
     init_channel(&channel1, &board_buttons.button_b.degrade());
 
-    //interrupt_free(move |cs| {
-      //  *GPIO.borrow(cs).borrow_mut() = Some(gpiote);
     critical_section::with(|cs| {
         *GPIO.borrow(cs).borrow_mut() = Some(gpiote);
 
@@ -38,4 +33,3 @@ pub fn init_buttons(board_gpiote: pac::GPIOTE, board_buttons: Buttons) {
         pac::NVIC::unpend(pac::Interrupt::GPIOTE);
     });
 }
-
