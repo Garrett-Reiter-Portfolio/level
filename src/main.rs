@@ -12,12 +12,7 @@ use rtt_target::{rprintln, rtt_init_print};
 
 use microbit::{
     display::blocking::Display,
-    hal::{
-        Timer,
-        gpiote::Gpiote,
-        pac::{self, interrupt},
-        twim,
-    },
+    hal::{Timer, gpiote::Gpiote, pac::interrupt, twim},
     pac::twim0::frequency::FREQUENCY_A,
 };
 
@@ -104,19 +99,16 @@ fn init() -> ! {
         )
         .unwrap();
 
-    unsafe { pac::NVIC::unmask(pac::Interrupt::GPIOTE) };
-    pac::NVIC::unpend(pac::Interrupt::GPIOTE);
-
     loop {
         if sensor.accel_status().unwrap().xyz_new_data() {
             let (x, y, z) = sensor.acceleration().unwrap().xyz_mg();
             // RTT instead of normal print
             rprintln!("Acceleration: x {} y {} z {}", x, y, z);
-            bubble.0 = get_value(&x);
-            bubble.1 = -get_value(&y);
-            move_bubble(&bubble, &mut leds);
 
             if z < 0 {
+                bubble.0 = get_value(&x);
+                bubble.1 = -get_value(&y);
+                move_bubble(&bubble, &mut leds);
                 display.show(&mut timer, leds, FRAME);
             } else {
                 display.clear();
